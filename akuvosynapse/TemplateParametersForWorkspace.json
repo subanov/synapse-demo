@@ -1,0 +1,63 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "akuvosynapse"
+		},
+		"AkuvoDemo1_password": {
+			"value": ""
+		},
+		"AkuvoQA_password": {
+			"value": ""
+		},
+		"AzureBlobStorageAlpar_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabaseAlpar_connectionString": {
+			"value": ""
+		},
+		"CopyDataStorage_accountKey": {
+			"value": ""
+		},
+		"Demo1_password": {
+			"value": ""
+		},
+		"akuvosynapse-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:akuvosynapse.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AkuvoDemo1_properties_typeProperties_server": {
+			"value": "akuvodemo1.database.windows.net"
+		},
+		"AkuvoDemo1_properties_typeProperties_database": {
+			"value": "akuvodemo1"
+		},
+		"AkuvoDemo1_properties_typeProperties_userName": {
+			"value": "akuvodemoadmin"
+		},
+		"AkuvoQA_properties_typeProperties_server": {
+			"value": "akuvo-dev-sql.database.windows.net"
+		},
+		"AkuvoQA_properties_typeProperties_database": {
+			"value": "akuvo-qa-client-qa"
+		},
+		"AkuvoQA_properties_typeProperties_userName": {
+			"value": "janea"
+		},
+		"CopyDataStorage_properties_typeProperties_url": {
+			"value": "https://akvuosynapsestorage.dfs.core.windows.net/"
+		},
+		"Demo1_properties_typeProperties_server": {
+			"value": "akuvodemo1.database.windows.net"
+		},
+		"Demo1_properties_typeProperties_database": {
+			"value": "akuvodemo1"
+		},
+		"Demo1_properties_typeProperties_userName": {
+			"value": "akuvodemoadmin"
+		},
+		"akuvosynapse-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://akvuosynapsestorage.dfs.core.windows.net"
+		}
+	}
+}
