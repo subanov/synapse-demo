@@ -1,0 +1,19 @@
+{
+	"name": "DemoMetadataDriven_ogw_ControlDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AkuvoDemo1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "DemoMetadataDriven_ogw_20240813"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "CopyDataControlTable"
+		}
+	}
+}
