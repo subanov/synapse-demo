@@ -1,0 +1,36 @@
+{
+	"name": "CDCPersons",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabaseAlpar",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "first_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "last_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "height",
+				"type": "float",
+				"precision": 15
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Persons2"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
