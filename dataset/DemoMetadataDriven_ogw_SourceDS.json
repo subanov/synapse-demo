@@ -1,0 +1,33 @@
+{
+	"name": "DemoMetadataDriven_ogw_SourceDS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AkuvoQA",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cw_schema": {
+				"type": "String"
+			},
+			"cw_table": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "DemoMetadataDriven_ogw_20240813"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().cw_schema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().cw_table",
+				"type": "Expression"
+			}
+		}
+	}
+}
