@@ -33,6 +33,26 @@
 						"type": "DatasetReference"
 					}
 				}
+			},
+			{
+				"name": "MigrateTable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetMigrationTables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetMigrationTables').output",
+						"type": "Expression"
+					},
+					"batchCount": 6
+				}
 			}
 		],
 		"parameters": {
