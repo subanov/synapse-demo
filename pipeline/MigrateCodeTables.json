@@ -17,16 +17,30 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"queryTimeout": "02:00:00",
+						"sqlReaderQuery": {
+							"value": "SELECT * FROM dbo.MigrationTables",
+							"type": "Expression"
+						},
+						"queryTimeout": {
+							"value": "@{pipeline().parameters.ShortTimeout}",
+							"type": "Expression"
+						},
+						"isolationLevel": "ReadCommitted",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "SalesLTProduct",
+						"referenceName": "CodeTableList",
 						"type": "DatasetReference"
 					}
 				}
 			}
 		],
+		"parameters": {
+			"ShortTimeout": {
+				"type": "string",
+				"defaultValue": "00:00:20"
+			}
+		},
 		"folder": {
 			"name": "Demo"
 		},
