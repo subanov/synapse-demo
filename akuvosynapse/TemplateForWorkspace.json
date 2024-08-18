@@ -931,21 +931,77 @@
 							"batchCount": 6,
 							"activities": [
 								{
-									"name": "SetSchemaName",
-									"type": "SetVariable",
+									"name": "CopyOneTable",
+									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "SchemaName",
-										"value": {
-											"value": "@item().SchemaName",
-											"type": "Expression"
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"isolationLevel": "ReadUncommitted",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"maxConcurrentConnections": 3,
+												"copyBehavior": "FlattenHierarchy"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
 										}
-									}
+									},
+									"inputs": [
+										{
+											"referenceName": "CopyDataSource",
+											"type": "DatasetReference",
+											"parameters": {
+												"schemaName": {
+													"value": "@item().schemaName",
+													"type": "Expression"
+												},
+												"tableName": {
+													"value": "@item().tableName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "CopyDataDestination",
+											"type": "DatasetReference",
+											"parameters": {
+												"clientId": {
+													"value": "@pipeline().parameters.ClientId",
+													"type": "Expression"
+												},
+												"tableName": {
+													"value": "@{item().schemaName}_@{item().tableName}",
+													"type": "Expression"
+												}
+											}
+										}
+									]
 								}
 							]
 						}
@@ -958,6 +1014,10 @@
 					"ShortTimeout": {
 						"type": "string",
 						"defaultValue": "00:00:20"
+					},
+					"ClientId": {
+						"type": "string",
+						"defaultValue": "1"
 					}
 				},
 				"variables": {
@@ -971,7 +1031,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/CodeTableList')]"
+				"[concat(variables('workspaceId'), '/datasets/CodeTableList')]",
+				"[concat(variables('workspaceId'), '/datasets/CopyDataSource')]",
+				"[concat(variables('workspaceId'), '/datasets/CopyDataDestination')]"
 			]
 		},
 		{
@@ -1661,6 +1723,90 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyDataSource')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AkuvoDemo1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"schemaName": {
+						"type": "string"
+					},
+					"tableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().schemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().tableName",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyDataDestination')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CopyDataStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"clientId": {
+						"type": "string"
+					},
+					"tableName": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().tableName}.parquet",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().tableName",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().clientId",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/CopyDataStorage')]"
+			]
 		}
 	]
 }
