@@ -1,0 +1,41 @@
+{
+	"name": "CopyDataDestination",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "CopyDataStorage",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"clientId": {
+				"type": "string"
+			},
+			"tableName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Demo"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{dataset().tableName}.parquet",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().tableName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().clientId",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
