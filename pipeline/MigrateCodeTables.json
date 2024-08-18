@@ -73,7 +73,26 @@
 									"isolationLevel": "ReadUncommitted",
 									"partitionOption": "None"
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings",
+										"maxConcurrentConnections": 3,
+										"copyBehavior": "FlattenHierarchy"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
 							},
 							"inputs": [
 								{
@@ -86,6 +105,22 @@
 										},
 										"tableName": {
 											"value": "@item().tableName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "CopyDataDestination",
+									"type": "DatasetReference",
+									"parameters": {
+										"clientId": {
+											"value": "@pipeline().parameters.ClientId",
+											"type": "Expression"
+										},
+										"tableName": {
+											"value": "@{item().schemaName}_@{item().tableName}",
 											"type": "Expression"
 										}
 									}
