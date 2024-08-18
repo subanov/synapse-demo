@@ -907,7 +907,8 @@
 								"referenceName": "CodeTableList",
 								"type": "DatasetReference",
 								"parameters": {}
-							}
+							},
+							"firstRowOnly": false
 						}
 					},
 					{
