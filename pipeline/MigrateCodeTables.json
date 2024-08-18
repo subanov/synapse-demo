@@ -77,8 +77,18 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "SalesLTProduct",
-									"type": "DatasetReference"
+									"referenceName": "CopyDataSource",
+									"type": "DatasetReference",
+									"parameters": {
+										"schemaName": {
+											"value": "@item().schemaName",
+											"type": "Expression"
+										},
+										"tableName": {
+											"value": "@item().tableName",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
