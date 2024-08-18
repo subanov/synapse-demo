@@ -55,20 +55,19 @@
 					"batchCount": 6,
 					"activities": [
 						{
-							"name": "SetSchemaName",
-							"type": "SetVariable",
+							"name": "CopyOneTable",
+							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
 								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "SchemaName",
-								"value": {
-									"value": "@item().SchemaName",
-									"type": "Expression"
-								}
+								"enableStaging": false
 							}
 						}
 					]
@@ -79,6 +78,10 @@
 			"ShortTimeout": {
 				"type": "string",
 				"defaultValue": "00:00:20"
+			},
+			"ClientId": {
+				"type": "string",
+				"defaultValue": "1"
 			}
 		},
 		"variables": {
