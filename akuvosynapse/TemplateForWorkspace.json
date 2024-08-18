@@ -859,11 +859,6 @@
 						"defaultValue": "dbo.CopyDataControlTable"
 					}
 				},
-				"variables": {
-					"SchemaName": {
-						"type": "String"
-					}
-				},
 				"folder": {
 					"name": "DemoMetadataDriven_ogw_20240813"
 				},
@@ -929,7 +924,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('GetMigrationTables').output",
+								"value": "@activity('GetMigrationTables').output.value",
 								"type": "Expression"
 							},
 							"batchCount": 6,
@@ -1016,6 +1011,51 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/AzureSqlDatabaseAlpar')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CodeTableList')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AkuvoDemo1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TableName",
+						"type": "varchar"
+					},
+					{
+						"name": "SchemaName",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedOn",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedOn",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "MigrationTables"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
 			]
 		},
 		{
@@ -1620,51 +1660,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/CodeTableList')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AkuvoDemo1",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Demo"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "TableName",
-						"type": "varchar"
-					},
-					{
-						"name": "SchemaName",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedOn",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedOn",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "MigrationTables"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
-			]
 		}
 	]
 }
