@@ -31,7 +31,8 @@
 					"dataset": {
 						"referenceName": "CodeTableList",
 						"type": "DatasetReference"
-					}
+					},
+					"firstRowOnly": false
 				}
 			},
 			{
@@ -48,7 +49,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetMigrationTables').output.value",
+						"value": "@activity('GetMigrationTables').output",
 						"type": "Expression"
 					},
 					"batchCount": 6,
