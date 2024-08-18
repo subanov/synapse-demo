@@ -26,11 +26,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@dataset().tableName",
-					"type": "Expression"
-				},
-				"fileSystem": {
-					"value": "@dataset().clientId",
+					"value": "@{dataset().clientId}/@{dataset().tableName}",
 					"type": "Expression"
 				}
 			},
