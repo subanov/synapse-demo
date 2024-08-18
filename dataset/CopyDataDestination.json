@@ -28,7 +28,8 @@
 				"folderPath": {
 					"value": "@{dataset().clientId}/@{dataset().tableName}",
 					"type": "Expression"
-				}
+				},
+				"fileSystem": "akuvosynapsefilesystem"
 			},
 			"compressionCodec": "snappy"
 		},
