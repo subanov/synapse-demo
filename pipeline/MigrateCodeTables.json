@@ -1,0 +1,9 @@
+{
+	"name": "MigrateCodeTables",
+	"properties": {
+		"folder": {
+			"name": "Demo"
+		},
+		"annotations": []
+	}
+}
