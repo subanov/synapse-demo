@@ -7,6 +7,10 @@
 			"metadata": "Workspace name",
 			"defaultValue": "akuvosynapse"
 		},
+		"AKUVO_QA_P_sql_db_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'AKUVO_QA_P_sql_db'"
+		},
 		"AkuvoDemo1_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'AkuvoDemo1'"
@@ -35,6 +39,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'akuvosynapse-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:akuvosynapse.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AKUVO_QA_P_sql_db_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "akuvo-dev-sql.database.windows.net"
+		},
+		"AKUVO_QA_P_sql_db_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "akuvo-qa-client-qa"
+		},
+		"AKUVO_QA_P_sql_db_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "janea"
 		},
 		"AkuvoDemo1_properties_typeProperties_server": {
 			"type": "string",
@@ -843,6 +859,11 @@
 						"defaultValue": "dbo.CopyDataControlTable"
 					}
 				},
+				"variables": {
+					"SchemaName": {
+						"type": "String"
+					}
+				},
 				"folder": {
 					"name": "DemoMetadataDriven_ogw_20240813"
 				},
@@ -853,6 +874,108 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/DemoMetadataDriven_ogw_ControlDS')]",
 				"[concat(variables('workspaceId'), '/pipelines/DemoMetadataDriven_ogw_MiddleLevel')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/MigrateCodeTables')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetMigrationTables",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 1,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT * FROM dbo.MigrationTables",
+									"type": "Expression"
+								},
+								"queryTimeout": {
+									"value": "@{pipeline().parameters.ShortTimeout}",
+									"type": "Expression"
+								},
+								"isolationLevel": "ReadCommitted",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "CodeTableList",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "MigrateTable",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetMigrationTables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetMigrationTables').output",
+								"type": "Expression"
+							},
+							"batchCount": 6,
+							"activities": [
+								{
+									"name": "SetSchemaName",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "SchemaName",
+										"value": {
+											"value": "@item().SchemaName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ShortTimeout": {
+						"type": "string",
+						"defaultValue": "00:00:20"
+					}
+				},
+				"variables": {
+					"SchemaName": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/CodeTableList')]"
 			]
 		},
 		{
@@ -1135,6 +1258,34 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AKUVO_QA_P_sql_db')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AKUVO_QA_P_sql_db_properties_typeProperties_server')]",
+					"database": "[parameters('AKUVO_QA_P_sql_db_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AKUVO_QA_P_sql_db_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('AKUVO_QA_P_sql_db_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{
@@ -1469,6 +1620,51 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CodeTableList')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AkuvoDemo1",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "TableName",
+						"type": "varchar"
+					},
+					{
+						"name": "SchemaName",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedOn",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedOn",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "MigrationTables"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
+			]
 		}
 	]
 }

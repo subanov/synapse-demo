@@ -5,6 +5,9 @@
 		"workspaceName": {
 			"value": "akuvosynapse"
 		},
+		"AKUVO_QA_P_sql_db_password": {
+			"value": ""
+		},
 		"AkuvoDemo1_password": {
 			"value": ""
 		},
@@ -25,6 +28,15 @@
 		},
 		"akuvosynapse-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:akuvosynapse.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AKUVO_QA_P_sql_db_properties_typeProperties_server": {
+			"value": "akuvo-dev-sql.database.windows.net"
+		},
+		"AKUVO_QA_P_sql_db_properties_typeProperties_database": {
+			"value": "akuvo-qa-client-qa"
+		},
+		"AKUVO_QA_P_sql_db_properties_typeProperties_userName": {
+			"value": "janea"
 		},
 		"AkuvoDemo1_properties_typeProperties_server": {
 			"value": "akuvodemo1.database.windows.net"
