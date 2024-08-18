@@ -1,0 +1,40 @@
+{
+	"name": "CodeTableList",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AkuvoDemo1",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Demo"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "TableName",
+				"type": "varchar"
+			},
+			{
+				"name": "SchemaName",
+				"type": "varchar"
+			},
+			{
+				"name": "CreatedOn",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "ModifiedOn",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "MigrationTables"
+		}
+	}
+}
