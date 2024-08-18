@@ -48,7 +48,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetMigrationTables').output",
+						"value": "@activity('GetMigrationTables').output.value",
 						"type": "Expression"
 					},
 					"batchCount": 6,
