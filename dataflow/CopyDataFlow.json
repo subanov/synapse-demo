@@ -17,7 +17,15 @@
 			],
 			"sinks": [
 				{
-					"name": "sink1"
+					"dataset": {
+						"referenceName": "CopyDataDestination",
+						"type": "DatasetReference"
+					},
+					"name": "ParquetDestination",
+					"rejectedDataLinkedService": {
+						"referenceName": "CopyDataStorage",
+						"type": "LinkedServiceReference"
+					}
 				}
 			],
 			"transformations": [],
@@ -37,8 +45,13 @@
 				"     )) ~> SqlServerTable",
 				"SqlServerTable sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:[''],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true) ~> ParquetDestination"
 			]
 		}
 	}
