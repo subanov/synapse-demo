@@ -150,7 +150,7 @@
 											"value": "'@{item().PartitionBy}'",
 											"type": "Expression"
 										},
-										"parquetFilenamePattern": {
+										"outputFilename": {
 											"value": "'@{item().schemaName}_@{item().tableName}'",
 											"type": "Expression"
 										}
