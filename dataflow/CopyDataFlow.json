@@ -1,0 +1,45 @@
+{
+	"name": "CopyDataFlow",
+	"properties": {
+		"folder": {
+			"name": "Demo"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CopyDataSource",
+						"type": "DatasetReference"
+					},
+					"name": "SqlServerTable"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"parameters{",
+				"     schema as string,",
+				"     table as string,",
+				"     partitionBy as string",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table',",
+				"     partitionBy('key',",
+				"          0,",
+				"          $partitionBy",
+				"     )) ~> SqlServerTable",
+				"SqlServerTable sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}
