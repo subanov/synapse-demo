@@ -31,7 +31,8 @@
 			"transformations": [],
 			"scriptLines": [
 				"parameters{",
-				"     partitionBy as string",
+				"     partitionBy as string,",
+				"     parquetFilenamePattern as string",
 				"}",
 				"source(allowSchemaDrift: true,",
 				"     validateSchema: false,",
@@ -40,7 +41,7 @@
 				"SqlServerTable sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
-				"     partitionFileNames:[''],",
+				"     partitionFileNames:[($parquetFilenamePattern)],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
