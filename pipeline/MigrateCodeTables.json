@@ -149,6 +149,10 @@
 										"partitionBy": {
 											"value": "'@{item().PartitionBy}'",
 											"type": "Expression"
+										},
+										"parquetFilenamePattern": {
+											"value": "'@{item().schemaName}_@{item().tableName}'",
+											"type": "Expression"
 										}
 									},
 									"datasetParameters": {
