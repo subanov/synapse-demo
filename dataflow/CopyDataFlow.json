@@ -46,6 +46,7 @@
 				"     postCommands: [],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
+				"     saveOrder: 1,",
 				"     partitionBy('key',",
 				"          0,",
 				"          $partitionBy",
