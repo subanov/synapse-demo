@@ -28,7 +28,11 @@
 					}
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "PartitionColumn"
+				}
+			],
 			"scriptLines": [
 				"parameters{",
 				"     partitionBy as string,",
@@ -38,7 +42,8 @@
 				"     validateSchema: false,",
 				"     isolationLevel: 'READ_UNCOMMITTED',",
 				"     format: 'table') ~> SqlServerTable",
-				"SqlServerTable sink(allowSchemaDrift: true,",
+				"SqlServerTable derive(PartitionBy = $partitionBy) ~> PartitionColumn",
+				"PartitionColumn sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     format: 'parquet',",
 				"     filePattern:(concat($outputFilename, '[n].parquet')),",
@@ -50,7 +55,7 @@
 				"     saveOrder: 1,",
 				"     partitionBy('key',",
 				"          0,",
-				"          $partitionBy",
+				"          PartitionBy",
 				"     )) ~> ParquetDestination"
 			]
 		}
