@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaseAlpar'"
 		},
+		"ClientDb_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ClientDb'"
+		},
 		"CopyDataStorage_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'CopyDataStorage'"
@@ -73,6 +77,18 @@
 			"defaultValue": "akuvo-qa-client-qa"
 		},
 		"AkuvoQA_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "janea"
+		},
+		"ClientDb_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "akuvodemo1.database.windows.net"
+		},
+		"ClientDb_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "akuvodemo1"
+		},
+		"ClientDb_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "janea"
 		},
@@ -933,6 +949,8 @@
 								{
 									"name": "CopyOneTable",
 									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
@@ -1002,6 +1020,57 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "CopyOneTableWithFlow",
+									"type": "ExecuteDataFlow",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataflow": {
+											"referenceName": "CopyDataFlow",
+											"type": "DataFlowReference",
+											"parameters": {
+												"partitionBy": {
+													"value": "'@{item().PartitionBy}'",
+													"type": "Expression"
+												},
+												"outputFilename": {
+													"value": "'@item().schemaName}_@{item().tableName'",
+													"type": "Expression"
+												}
+											},
+											"datasetParameters": {
+												"SqlServerTable": {
+													"schemaName": {
+														"value": "@item().schemaName",
+														"type": "Expression"
+													},
+													"tableName": {
+														"value": "@item().tableName",
+														"type": "Expression"
+													}
+												},
+												"ParquetDestination": {
+													"clientId": "1",
+													"tableName": "@{item().schemaName}_@{item().tableName}"
+												}
+											}
+										},
+										"staging": {},
+										"compute": {
+											"coreCount": 8,
+											"computeType": "General"
+										},
+										"traceLevel": "Fine"
+									}
 								}
 							]
 						}
@@ -1033,7 +1102,8 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/CodeTableList')]",
 				"[concat(variables('workspaceId'), '/datasets/CopyDataSource')]",
-				"[concat(variables('workspaceId'), '/datasets/CopyDataDestination')]"
+				"[concat(variables('workspaceId'), '/datasets/CopyDataDestination')]",
+				"[concat(variables('workspaceId'), '/dataflows/CopyDataFlow')]"
 			]
 		},
 		{
@@ -1115,6 +1185,87 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "MigrationTables"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyDataDestination')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CopyDataStorage",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"clientId": {
+						"type": "string"
+					},
+					"tableName": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().tableName}.parquet",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@{dataset().clientId}/@{dataset().tableName}",
+							"type": "Expression"
+						},
+						"fileSystem": "akuvosynapsefilesystem"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/CopyDataStorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyDataSource')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AkuvoDemo1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"schemaName": {
+						"type": "string"
+					},
+					"tableName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Demo"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().schemaName",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().tableName",
+						"type": "Expression"
+					}
 				}
 			},
 			"dependsOn": [
@@ -1486,6 +1637,39 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/ClientDb')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"serverName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ClientDb_properties_typeProperties_server')]",
+					"database": "[parameters('ClientDb_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ClientDb_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ClientDb_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/CopyDataStorage')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -1580,6 +1764,36 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Trigger 1')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "CDC_ingest",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 15,
+						"startTime": "2024-08-19T13:15:00",
+						"timeZone": "GTB Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/CDC_ingest')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
 			"apiVersion": "2019-06-01-preview",
@@ -1642,7 +1856,7 @@
 						"     validateSchema: false,",
 						"     enableNativeCdc: true,",
 						"     netChanges: true,",
-						"     skipInitialLoad: false,",
+						"     skipInitialLoad: true,",
 						"     isolationLevel: 'READ_UNCOMMITTED',",
 						"     format: 'table') ~> source1",
 						"source1 derive(full_name = first_name+\" \"+last_name,",
@@ -1650,7 +1864,11 @@
 						"          is_insert = isInsert(),",
 						"          is_update = isUpdate(),",
 						"          is_upsert = isUpsert(),",
-						"          operation_type = case(isUpdate(), 'UPDATE', isInsert(), 'INSERT', isDelete(), 'DELETE', isUpsert(), 'UPSERT')) ~> derivedColumn1",
+						"          operation_type = case(isUpdate(), 'UPDATE', isInsert(), 'INSERT', isDelete(), 'DELETE', isUpsert(), 'UPSERT'),",
+						"          seq = nextSequence(),",
+						"          currentDate = currentDate(),",
+						"          currentUTC = currentUTC(),",
+						"          currentTimestamp = currentTimestamp()) ~> derivedColumn1",
 						"derivedColumn1 select(mapColumn(",
 						"          id,",
 						"          first_name,",
@@ -1675,6 +1893,76 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/CDCPersons')]",
 				"[concat(variables('workspaceId'), '/datasets/ParquetPersonsCDC')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CopyDataFlow')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Demo"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CopyDataSource",
+								"type": "DatasetReference"
+							},
+							"name": "SqlServerTable"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "CopyDataDestination",
+								"type": "DatasetReference"
+							},
+							"name": "ParquetDestination",
+							"rejectedDataLinkedService": {
+								"referenceName": "CopyDataStorage",
+								"type": "LinkedServiceReference"
+							}
+						}
+					],
+					"transformations": [
+						{
+							"name": "PartitionColumn"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     partitionBy as string,",
+						"     outputFilename as string",
+						"}",
+						"source(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> SqlServerTable",
+						"SqlServerTable derive(PartitionBy = $partitionBy) ~> PartitionColumn",
+						"PartitionColumn sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'parquet',",
+						"     filePattern:(concat($outputFilename, '[n].parquet')),",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     saveOrder: 1,",
+						"     partitionBy('key',",
+						"          0,",
+						"          PartitionBy",
+						"     )) ~> ParquetDestination"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/CopyDataSource')]",
+				"[concat(variables('workspaceId'), '/datasets/CopyDataDestination')]",
+				"[concat(variables('workspaceId'), '/linkedServices/CopyDataStorage')]"
 			]
 		},
 		{
@@ -1723,90 +2011,6 @@
 			},
 			"dependsOn": [],
 			"location": "eastus2"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/CopyDataSource')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AkuvoDemo1",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"schemaName": {
-						"type": "string"
-					},
-					"tableName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Demo"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": {
-						"value": "@dataset().schemaName",
-						"type": "Expression"
-					},
-					"table": {
-						"value": "@dataset().tableName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/AkuvoDemo1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/CopyDataDestination')]",
-			"type": "Microsoft.Synapse/workspaces/datasets",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "CopyDataStorage",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"clientId": {
-						"type": "string"
-					},
-					"tableName": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Demo"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": {
-							"value": "@{dataset().tableName}.parquet",
-							"type": "Expression"
-						},
-						"folderPath": {
-							"value": "@dataset().tableName",
-							"type": "Expression"
-						},
-						"fileSystem": {
-							"value": "@dataset().clientId",
-							"type": "Expression"
-						}
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/CopyDataStorage')]"
-			]
 		}
 	]
 }

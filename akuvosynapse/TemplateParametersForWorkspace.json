@@ -20,6 +20,9 @@
 		"AzureSqlDatabaseAlpar_connectionString": {
 			"value": ""
 		},
+		"ClientDb_password": {
+			"value": ""
+		},
 		"CopyDataStorage_accountKey": {
 			"value": ""
 		},
@@ -54,6 +57,15 @@
 			"value": "akuvo-qa-client-qa"
 		},
 		"AkuvoQA_properties_typeProperties_userName": {
+			"value": "janea"
+		},
+		"ClientDb_properties_typeProperties_server": {
+			"value": "akuvodemo1.database.windows.net"
+		},
+		"ClientDb_properties_typeProperties_database": {
+			"value": "akuvodemo1"
+		},
+		"ClientDb_properties_typeProperties_userName": {
 			"value": "janea"
 		},
 		"CopyDataStorage_properties_typeProperties_url": {
