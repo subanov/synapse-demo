@@ -1,7 +1,7 @@
 {
-	"name": "Person",
+	"name": "Country",
 	"properties": {
-		"Name": "Person",
+		"Name": "Country",
 		"EntityType": "TABLE",
 		"Namespace": {
 			"DatabaseName": "Database1"
@@ -14,11 +14,11 @@
 		"StorageDescriptor": {
 			"Columns": [
 				{
-					"Name": "first_name",
+					"Name": "name",
 					"OriginDataTypeName": {
 						"TypeName": "string",
-						"IsComplexType": false,
 						"IsNullable": false,
+						"IsComplexType": false,
 						"Length": 256,
 						"Properties": {
 							"HIVE_TYPE_STRING": "string"
@@ -27,34 +27,7 @@
 					"DeltaFormatInvalidMessages": []
 				},
 				{
-					"Name": "last_name",
-					"Description": "",
-					"OriginDataTypeName": {
-						"TypeName": "string",
-						"IsComplexType": false,
-						"IsNullable": false,
-						"Length": 256,
-						"Properties": {
-							"HIVE_TYPE_STRING": "string"
-						}
-					},
-					"DeltaFormatInvalidMessages": []
-				},
-				{
-					"Name": "age",
-					"Description": "",
-					"OriginDataTypeName": {
-						"TypeName": "integer",
-						"IsComplexType": false,
-						"IsNullable": false,
-						"Properties": {
-							"HIVE_TYPE_STRING": "integer"
-						}
-					},
-					"DeltaFormatInvalidMessages": []
-				},
-				{
-					"Name": "country_id",
+					"Name": "flag",
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "string",
@@ -72,8 +45,8 @@
 					"Description": "",
 					"OriginDataTypeName": {
 						"TypeName": "string",
-						"IsComplexType": false,
 						"IsNullable": false,
+						"IsComplexType": false,
 						"Length": 256,
 						"Properties": {
 							"HIVE_TYPE_STRING": "string"
@@ -88,13 +61,13 @@
 				"FormatType": "parquet",
 				"SerializeLib": "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe",
 				"Properties": {
-					"path": "abfss://@.dfs.core.windows.net/Person",
+					"path": "abfss://@.dfs.core.windows.net/Country",
 					"FormatTypeSetToDatabaseDefault": true
 				}
 			},
 			"Source": {
 				"Provider": "ADLS",
-				"Location": "abfss://@.dfs.core.windows.net/Person",
+				"Location": "abfss://@.dfs.core.windows.net/Country",
 				"Properties": {
 					"LinkedServiceName": "AzureDataLakeStorage1Alpar",
 					"LocationSetToDatabaseDefault": true
@@ -112,7 +85,8 @@
 			"Description": "",
 			"DisplayFolderInfo": "{\"name\":\"Others\",\"colorCode\":\"\"}",
 			"PrimaryKeys": "",
-			"spark.sql.sources.provider": "parquet"
+			"spark.sql.sources.provider": "parquet",
+			"sql:IsAppendOnly": false
 		},
 		"Retention": 0,
 		"Temporary": false,

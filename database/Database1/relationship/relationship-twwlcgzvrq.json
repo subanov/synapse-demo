@@ -1,0 +1,23 @@
+{
+	"name": "relationship-twwlcgzvrq",
+	"properties": {
+		"Name": "relationship-twwlcgzvrq",
+		"EntityType": "RELATIONSHIP",
+		"Namespace": {
+			"DatabaseName": "Database1"
+		},
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"FromTableName": "Country",
+		"ToTableName": "Person",
+		"ColumnRelationshipInformations": [
+			{
+				"FromColumnName": "id",
+				"ToColumnName": "country_id"
+			}
+		],
+		"RelationshipType": 0
+	},
+	"type": "RELATIONSHIP"
+}
